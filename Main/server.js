@@ -1,39 +1,44 @@
+const path = require('path');
 const express = require('express');
 const session = require('express-session');
-const sequelize = require('./config/config'); // Adjust the path as needed
+const exphbs = require('express-handlebars');
+const helpers = require('./utils/helpers');
 
 const app = express();
 const PORT = process.env.PORT || 3009;
 
-const sessionConfig = {
+const sequelize = require('./config/config');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+
+const sess = {
   secret: 'Super secret secret',
   cookie: {
-    maxAge: 300000, // Adjust as needed
+    maxAge: 300000,
     httpOnly: true,
-    secure: false, // Set to true in production with HTTPS
+    secure: false,
     sameSite: 'strict',
   },
   resave: false,
   saveUninitialized: true,
+  store: new SequelizeStore({
+    db: sequelize
+  })
 };
 
-app.use(session(sessionConfig));
+app.use(session(sess));
+
+const hbs = exphbs.create({ helpers });
+
+app.engine('handlebars', hbs.engine);
+app.set('view engine', 'handlebars');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Define your API routes here
-const apiRoutes = require('./Controllers/api/index'); // Adjust the path as needed
-app.use('/api', apiRoutes);
+app.use(require('./Controllers/'));
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
-});
-
-sequelize.sync({ force: false }).then(() => {
-  app.listen(PORT, () => {
-    console.log(`App listening on port ${PORT}!`);
-  });
+app.listen(PORT, () => {
+  console.log(`App listening on port ${PORT}!`);
+  sequelize.sync({ force: false });
 });

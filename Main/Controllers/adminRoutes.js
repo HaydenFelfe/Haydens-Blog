@@ -12,7 +12,7 @@ router.get('/', withAuth, async (req, res) => {
 
     const posts = postData.map((post) => post.get({ plain: true }));
 
-    res.render('admin-all-posts', {
+    res.render('all-posts', {
       layout: 'dashboard',
       posts,
     });
@@ -22,7 +22,7 @@ router.get('/', withAuth, async (req, res) => {
 });
 
 router.get('/new', withAuth, (req, res) => {
-  res.render('admin-new-post', {
+  res.render('new-post', {
     layout: 'dashboard',
   });
 });
@@ -34,7 +34,7 @@ router.get('/edit/:id', withAuth, async (req, res) => {
     if (postData) {
       const post = postData.get({ plain: true });
 
-      res.render('admin-edit-post', {
+      res.render('edit-post', {
         layout: 'dashboard',
         post,
       });
