@@ -1,6 +1,6 @@
 # Hayden's Blog
 
-![Website Screenshot](./Main/assets/haydensblog.png)
+![Website Screenshot](./assets/haydensblog.png)
 
 
 ## Features
